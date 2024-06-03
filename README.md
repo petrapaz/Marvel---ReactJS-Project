@@ -38,6 +38,8 @@ Marvel API requires a hash to authenticate requests, which includes a timestamp,
    
    Also, add css for styling: src/App.css
 
+8)  If you haven't already, install React Router, which is a popular routing library for React applications: npm install react-router-dom
+
 9) START YOUR REACT APPLICATION BY RUNNING FOLLOWING COMMANDS:
      - npm install
      - npm start //this command opens project on localhost
