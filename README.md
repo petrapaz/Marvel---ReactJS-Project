@@ -10,6 +10,11 @@ TASK:
 - Website should be responsive, cover mobile, tablet, laptop
 - You can use all the tools available and libraries
 
+MARVEL DEVELOPER PORTAL:
+- go to My developer account to fetch private and public api keys
+- go to Your authorized referrers. List any domains that can make calls to the Marvel Comics API using your API key here: localhost, IP address, *, developer.marvel.com, localhost
+- click: UPDATE
+
 HOW TO INITIATE PROJECT:
 1) open terminal and change directory to location where you want your project to be positioned
 2) ensure you have Node.js and npm installed on your system.
