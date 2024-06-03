@@ -1,3 +1,50 @@
+MARVEL COMICS REACTJS WEB APP
+
+TASK:
+1. Instantiate a new React project and push it to a github repo
+2. Use the Marvel API https://developer.marvel.com/ to get a list of comics and display them on page, cards with at least an image, title and description (you need to create account and obtain API Key)
+3. Details route - When you click on a card it should take you to a new route with that cards details
+4. Add search functionality
+5. Add pagination, go to next or previous page
+6. Deploy it
+- Website should be responsive, cover mobile, tablet, laptop
+- You can use all the tools available and libraries
+
+HOW TO INITIATE PROJECT:
+1) open terminal and change directory to location where you want your project to be positioned
+2) ensure you have Node.js and npm installed on your system.
+3) Create a new React project using create-react-app:
+      npx create-react-app marvel-comics
+      cd marvel-comics
+4) Install Axios for HTTP Requests:
+      npm install axios
+5) Create Environment Variables: Create a .env file in the root of your project to store your Marvel API keys securely. Also, don't forget to add .env file to .gitignore file (you want to keep your private key private!)
+      REACT_APP_MARVEL_PUBLIC_KEY=your_public_key
+      REACT_APP_MARVEL_PRIVATE_KEY=your_private_key
+6) Create a Utility File for Hashing:
+First, you need to install the md5 library, which will help us generate the required hash.
+      npm install md5
+
+Marvel API requires a hash to authenticate requests, which includes a timestamp, private key, and public key. Create a utils directory with a hash.js file:
+
+      // src/utils/hash.js
+      import md5 from 'md5';
+      
+      export const getMarvelHash = (ts, privateKey, publicKey) => {
+        return md5(ts + privateKey + publicKey);
+      };
+
+7) Create the main component: src/App.js
+   
+   Also, add css for styling: src/App.css
+
+9) START YOUR REACT APPLICATION BY RUNNING FOLLOWING COMMANDS:
+     - npm install
+     - npm start //this command opens project on localhost
+
+
+____________________________________________________________________________
+       
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
@@ -39,32 +86,3 @@ Instead, it will copy all the configuration files and the transitive dependencie
 
 You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
