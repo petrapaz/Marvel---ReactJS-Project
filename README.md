@@ -1,3 +1,59 @@
+Install Necessary Dependencies: Install Axios for making HTTP requests and React Router for handling routing:
+    npm install axios react-router-dom md5
+
+Run the application: npm start
+
+-------------------------------------------------------------------------
+MARVEL COMICS REACTJS WEB APP
+
+TASK:
+
+Instantiate a new React project and push it to a github repo
+Use the Marvel API https://developer.marvel.com/ to get a list of comics and display them on page, cards with at least an image, title and description (you need to create account and obtain API Key)
+Details route - When you click on a card it should take you to a new route with that cards details
+Add search functionality
+Add pagination, go to next or previous page
+Deploy it
+Website should be responsive, cover mobile, tablet, laptop
+You can use all the tools available and libraries
+
+
+MARVEL DEVELOPER PORTAL:
+
+go to My developer account to fetch private and public api keys
+go to Your authorized referrers. List any domains that can make calls to the Marvel Comics API using your API key here: localhost, IP address, *, developer.marvel.com, localhost
+click: UPDATE
+
+
+HOW TO INITIATE PROJECT:
+
+open terminal and change directory to location where you want your project to be positioned
+ensure you have Node.js and npm installed on your system.
+Create a new React project using create-react-app: npx create-react-app marvel-comics cd marvel-comics
+Install Axios for HTTP Requests: npm install axios
+Create Environment Variables: Create a .env file in the root of your project to store your Marvel API keys securely. Also, don't forget to add .env file to .gitignore file (you want to keep your private key private!) REACT_APP_MARVEL_PUBLIC_KEY=your_public_key REACT_APP_MARVEL_PRIVATE_KEY=your_private_key
+Create a Utility File for Hashing: First, you need to install the md5 library, which will help us generate the required hash. npm install md5
+Marvel API requires a hash to authenticate requests, which includes a timestamp, private key, and public key. Create a utils directory with a hash.js file:
+
+  // src/utils/hash.js
+  import md5 from 'md5';
+  
+  export const getMarvelHash = (ts, privateKey, publicKey) => {
+    return md5(ts + privateKey + publicKey);
+  };
+
+Create the main component: src/App.js
+
+Also, add css for styling: src/App.css
+
+If you haven't already, install React Router, which is a popular routing library for React applications: npm install react-router-dom
+
+START YOUR REACT APPLICATION BY RUNNING FOLLOWING COMMANDS:
+
+npm install
+npm start //this command opens project on localhost
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

@@ -1,0 +1,34 @@
+/* src/styles/ComicDetails.css */
+
+.comic-details {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin: 20px auto; /* Center the container horizontally and add some margin at the top */
+    border: 2px solid #fff; /* Add white outline */
+    padding: 20px; /* Add padding for spacing */
+  }
+  
+  .comic-details img {
+    border-radius: 10px;
+    width: 100%; /* Adjust the width of the image to fill its container */
+    max-width: 100%; /* Set maximum width to prevent image overflow */
+    height: auto;
+    margin-bottom: 20px; /* Add margin at the bottom for separation */
+  }
+  
+  @media (min-width: 768px) {
+    .comic-details {
+      flex-direction: row; /* Change to row layout for larger screens */
+      align-items: flex-start; /* Align items to the start for larger screens */
+      text-align: left; /* Align text to the left for larger screens */
+    }
+  
+    .comic-details img {
+      margin-right: 20px; /* Add margin to the right for separation */
+      max-width: 50%; /* Set maximum width for image on larger screens */
+    }
+  }
+  
+  
