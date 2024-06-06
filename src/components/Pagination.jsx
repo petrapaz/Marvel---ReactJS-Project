@@ -20,11 +20,11 @@ const Pagination = ({ currentPage, setCurrentPage, totalComics }) => {
   return (
     <div className="pagination">
       <button onClick={handlePrevPage} disabled={currentPage === 1}>
-        &lt; Previous
+        Previous
       </button>
       <span>{currentPage} / {totalPages}</span>
       <button onClick={handleNextPage} disabled={currentPage === totalPages}>
-        Next &gt;
+        Next
       </button>
     </div>
   );

@@ -48,23 +48,28 @@ const ComicDetails = () => {
 
   return (
     <div className="comic-details">
+        
+        <img src={`${comic.thumbnail.path}/portrait_incredible.${comic.thumbnail.extension}`} alt={comic.title} />
+        
+
+      <div className='detail-text'>
       <h2>{comic.title}</h2>
-      <img src={`${comic.thumbnail.path}/portrait_incredible.${comic.thumbnail.extension}`} alt={comic.title} />
-      <p>{comic.description}</p>
-      <p><strong>Page Count:</strong> {comic.pageCount}</p>
-      <p><strong>Series:</strong> {comic.series.name}</p>
-      <p><strong>Prices:</strong></p>
-      <ul>
-        {comic.prices.map((price, index) => (
-          <li key={index}>{price.type}: ${price.price}</li>
-        ))}
-      </ul>
-      <p><strong>Creators:</strong></p>
-      <ul>
-        {comic.creators.items.map((creator, index) => (
-          <li key={index}>{creator.role}: {creator.name}</li>
-        ))}
-      </ul>
+        <p>{comic.description}</p>
+        <p><strong>Page Count:</strong> {comic.pageCount}</p>
+        <p><strong>Series:</strong> {comic.series.name}</p>
+        <p><strong>Prices:</strong></p>
+        <ul>
+          {comic.prices.map((price, index) => (
+            <li key={index}>{price.type}: ${price.price}</li>
+          ))}
+        </ul>
+        <p><strong>Creators:</strong></p>
+        <ul>
+          {comic.creators.items.map((creator, index) => (
+            <li key={index}>{creator.role}: {creator.name}</li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };

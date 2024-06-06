@@ -1,4 +1,3 @@
-// src/App.js
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import axios from 'axios';
@@ -8,7 +7,7 @@ import SearchBar from './components/SearchBar';
 import './styles/App.css';
 import ComicDetails from './components/ComicDetails';
 import Pagination from './components/Pagination';
-import logo from './logo.png'; // Import the logo image
+import logo from './pics/logo.png';
 
 const App = () => {
   const [comics, setComics] = useState([]);
@@ -30,13 +29,14 @@ const App = () => {
           ts,
           apikey: publicKey,
           hash,
-          limit: 20,
+          limit: 40,
           offset: offset,
         },
       })
       .then(response => {
-        setComics(response.data.data.results);
-        setFilteredComics(response.data.data.results);
+        const allComics = response.data.data.results;
+        setComics(allComics);
+        filterComics(allComics); // Filter comics after fetching them
         setTotalComics(response.data.data.total);
       })
       .catch(error => {
@@ -46,19 +46,22 @@ const App = () => {
 
   useEffect(() => {
     fetchComics(currentPage);
-  }, [currentPage]);
+  }, [currentPage]); // Fetch comics only when current page changes
+
+  useEffect(() => {
+    filterComics(comics); // Filter comics whenever the search term changes
+  }, [search, comics]);
+
+  const filterComics = (comicsToFilter) => {
+    const filtered = comicsToFilter.filter(comic =>
+      comic.title.toLowerCase().includes(search.toLowerCase())
+    );
+    setFilteredComics(filtered);
+  };
 
   const handleSearchChange = (e) => {
     const searchValue = e.target.value;
     setSearch(searchValue);
-    if (searchValue === '') {
-      setFilteredComics(comics);
-    } else {
-      const filtered = comics.filter(comic =>
-        comic.title.toLowerCase().includes(searchValue.toLowerCase())
-      );
-      setFilteredComics(filtered);
-    }
   };
 
   return (
@@ -80,7 +83,7 @@ const App = () => {
             <Pagination
               currentPage={currentPage}
               setCurrentPage={setCurrentPage}
-              totalComics={totalComics}
+              totalComics={totalComics / 40}
             />
           </>} />
           <Route path="/comic/:id" element={<ComicDetails comics={comics} />} />
@@ -91,4 +94,3 @@ const App = () => {
 };
 
 export default App;
-

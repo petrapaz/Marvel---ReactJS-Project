@@ -1,34 +1,86 @@
 /* src/styles/ComicDetails.css */
-
 .comic-details {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    margin: 20px auto; /* Center the container horizontally and add some margin at the top */
-    border: 2px solid #fff; /* Add white outline */
-    padding: 20px; /* Add padding for spacing */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: left;
+  margin: 20px auto; /* Center the container horizontally and add some margin at the top */
+  border: 2px solid #fff; /* Add white outline */
+  padding: 20px; /* Add padding for spacing */
+  max-width: 90%; /* Set a maximum width for larger screens */
+}
+
+.comic-details .detail-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: left;
+  margin: 20px auto; /* Center the container horizontally and add some margin at the top */
+  border: 2px solid #fff; /* Add white outline */
+  padding: 20px; /* Add padding for spacing */
+  max-width: 90%; /* Set a maximum width for larger screens */
+}
+
+.comic-details img {
+  border-radius: 10px;
+  width: 100%; /* Adjust the width of the image to fill its container */
+  max-width: 300px; /* Set maximum width to prevent image overflow */
+  height: auto;
+  margin-bottom: 20px; /* Add margin at the bottom for separation */
+}
+
+.comic-details .details {
+  width: 100%; /* Ensure the details take up the full width */
+}
+
+.comic-details .details h2 {
+  font-size: 2rem; /* Larger font size for comic book name */
+  margin-bottom: 20px; /* Add margin at the bottom for separation */
+}
+
+.comic-details .details p {
+  margin-bottom: 10px; /* Add margin for spacing between details */
+}
+
+@media (min-width: 500px) {
+  .comic-details {
+    flex-direction: row; /* Change to row layout for larger screens */
+    align-items: flex-start; /* Align items to the start */
   }
-  
+
   .comic-details img {
-    border-radius: 10px;
-    width: 100%; /* Adjust the width of the image to fill its container */
-    max-width: 100%; /* Set maximum width to prevent image overflow */
-    height: auto;
-    margin-bottom: 20px; /* Add margin at the bottom for separation */
+    margin-right: 20px; /* Add margin to the right of the image for separation */
+    max-width: 50%; /* Ensure image does not exceed 50% of the container width */
   }
-  
-  @media (min-width: 768px) {
-    .comic-details {
-      flex-direction: row; /* Change to row layout for larger screens */
-      align-items: flex-start; /* Align items to the start for larger screens */
-      text-align: left; /* Align text to the left for larger screens */
-    }
-  
-    .comic-details img {
-      margin-right: 20px; /* Add margin to the right for separation */
-      max-width: 50%; /* Set maximum width for image on larger screens */
-    }
+
+  .comic-details .details {
+    width: 50%; /* Details take up 50% of the container width */
   }
-  
-  
+
+  .comic-details .details h2 {
+    font-size: 1.5rem; /* Adjust font size */
+  }
+
+  .comic-details .details p {
+    margin-bottom: 5px; /* Adjust margin for spacing between details */
+  }
+}
+
+@media (max-width: 500px) {
+  .comic-details {
+    flex-direction: column; /* Column layout for smaller screens */
+    align-items: center; /* Center align items */
+    text-align: center; /* Center align text */
+  }
+
+  .comic-details img {
+    margin: 20px auto 20px; /* Center the image and add margin at the bottom */
+    max-width: 20%; /* Ensure the image does not exceed container width */
+  }
+
+  .comic-details .details {
+    width: 90%; /* Details take up full width */
+  }
+}
+
+
