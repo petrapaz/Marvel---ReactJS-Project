@@ -1,5 +1,10 @@
 # MARVEL COMICS REACTJS WEB APP
 
+## START THE PROJECT ON LOCALHOST:
+- Install Axios for making HTTP requests and React Router for handling routing:
+    npm install axios react-router-dom md5
+- Run the application: npm start
+
 ## TASK:
 1. Instantiate a new React project and push it to a github repo
 2. Use the Marvel API https://developer.marvel.com/ to get a list of comics and display them on page, cards with at least an image, title and description (you need to create account and obtain API Key)
@@ -49,10 +54,7 @@ Marvel API requires a hash to authenticate requests, which includes a timestamp,
      - npm install
      - npm start //this command opens project on localhost
 
-Install Necessary Dependencies: Install Axios for making HTTP requests and React Router for handling routing:
-    npm install axios react-router-dom md5
 
-Run the application: npm start
 ____________________________________________________________________________
        
 # Getting Started with Create React App
