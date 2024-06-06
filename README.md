@@ -1,6 +1,6 @@
 # MARVEL COMICS REACTJS WEB APP
 
-## START THE PROJECT ON LOCALHOST:
+### START THE PROJECT ON LOCALHOST:
 - Install Axios for making HTTP requests and React Router for handling routing:
     npm install axios react-router-dom md5
 - Run the application: npm start
