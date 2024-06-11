@@ -22,62 +22,103 @@ const App = () => {
   const ts = new Date().getTime();
   const hash = getMarvelHash(ts, privateKey, publicKey);
 
-  const fetchComics = async (offset = 0) => {
+  const fetchComics = async (offset = 0, retries = 3) => {
     try {
+      // Check if rate limit exceeded
+      if (retries === 3) {
+        console.error('Exceeded maximum retry attempts. Pausing requests to avoid rate limit.');
+        return [];
+      }
+  
       const response = await axios.get('https://gateway.marvel.com/v1/public/comics', {
         params: {
           ts,
           apikey: publicKey,
           hash,
-          limit: 100,
+          limit: comicsPerPage,
           offset: offset,
         },
       });
       console.log('Fetched comics batch:', response.data.data.results); // Debug log
       return response.data.data.results;
     } catch (error) {
-      console.error('Error fetching data from Marvel API', error);
-      return [];
-    }
-  };
-
-  const fetchAllComics = async () => {
-    let allComics = [];
-    let offset = 0;
-    let hasMoreComics = true;
-
-    while (hasMoreComics) {
-      const comicsBatch = await fetchComics(offset);
-      if (comicsBatch.length > 0) {
-        allComics = [...allComics, ...comicsBatch];
-        offset += 100;
+      if (error.response && error.response.status === 429) {
+        console.error('Rate limit exceeded. Pausing requests to avoid rate limit.');
+        await new Promise(resolve => setTimeout(resolve, 60000)); // Wait for 1 minute
+        return fetchComics(offset, retries - 1); // Retry fetching comics with one less retry
       } else {
-        hasMoreComics = false;
+        console.error('Error fetching data from Marvel API', error);
+        return [];
       }
     }
+  };
+  
+  
 
-    setComics(allComics);
-    setFilteredComics(allComics);
-    setTotalComics(allComics.length);
-    console.log('All fetched comics:', allComics); // Debug log
+  const fetchTotalComicsCount = async () => {
+    try {
+      const response = await axios.get('https://gateway.marvel.com/v1/public/comics', {
+        params: {
+          ts,
+          apikey: publicKey,
+          hash,
+          limit: 1,
+        },
+      });
+      return response.data.data.total;
+    } catch (error) {
+      console.error('Error fetching total comics count from Marvel API', error);
+      return 0;
+    }
+  };
+
+  const fetchPageComics = async (page) => {
+    const offset = (page - 1) * comicsPerPage;
+    const comicsBatch = await fetchComics(offset);
+    setComics(comicsBatch);
+    setFilteredComics(comicsBatch);
   };
 
   useEffect(() => {
-    fetchAllComics();
-  }, []);
+    const initializeComics = async () => {
+      const total = await fetchTotalComicsCount();
+      setTotalComics(total);
+      await fetchPageComics(currentPage);
+    };
+    initializeComics();
+  }, [currentPage]);
+
+  const fetchComicsByTitle = async (title) => {
+    try {
+      const response = await axios.get('https://gateway.marvel.com/v1/public/comics', {
+        params: {
+          ts,
+          apikey: publicKey,
+          hash,
+          titleStartsWith: title,
+          limit: comicsPerPage,
+        },
+      });
+      console.log('Fetched comics by title:', response.data.data.results); // Debug log
+      setFilteredComics(response.data.data.results);
+    } catch (error) {
+      if (error.response && error.response.status === 429) {
+        console.error('Rate limit exceeded. Retrying in 1 minute...');
+        await new Promise(resolve => setTimeout(resolve, 60000)); // Wait for 1 minute before retrying
+        return fetchComicsByTitle(title); // Retry fetching comics by title
+      } else {
+        console.error('Error fetching data from Marvel API', error);
+      }
+    }
+  };
 
   useEffect(() => {
-    filterComics(search);
-  }, [search, comics]);
-
-  const filterComics = (searchValue) => {
-    const filtered = comics.filter(comic =>
-      comic.title.toLowerCase().startsWith(searchValue.toLowerCase())
-    );
-    setFilteredComics(filtered);
-    setCurrentPage(1); // Reset to the first page when filtering
-    console.log('Filtered comics:', filtered); // Debug log
-  };
+    if (search) {
+      fetchComicsByTitle(search);
+    } else {
+      fetchPageComics(currentPage);
+    }
+  }, [search, currentPage]);
 
   const handleSearchChange = (e) => {
     const searchValue = e.target.value;
