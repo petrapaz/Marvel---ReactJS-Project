@@ -1,0 +1,55 @@
+/* src/styles/ComicList.css */
+.comics-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding-top: 80px; /* Adjusted to create space for the fixed header */
+  }
+  
+  .comic {
+    background-color: #fff; /* White background for comic cards */
+    color: #000; /* Black text for comic cards */
+    border-radius: 10px;
+    margin: 10px;
+    padding: 10px;
+    width: 200px;
+    height: 350px; /* Set a fixed height for comic cards */
+    text-align: center;
+    transition: transform 0.2s;
+    text-decoration: none; /* Remove underline from links */
+    position: relative; /* For positioning the overline */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  .comic:hover {
+    transform: scale(1.05);
+  }
+  
+  .comic img {
+    border-radius: 10px;
+    width: 100%;
+    height: auto;
+    border: 2px solid #ff0000; /* Red border for comic images */
+    max-height: 250px; /* Ensure the image does not exceed a certain height */
+  }
+  
+  .comic h2 {
+    font-family: 'Roboto', sans-serif; /* Readable font for comic titles */
+    font-size: 1rem; /* Adjust font size */
+    margin: 10px 0;
+  }
+  
+  .comic::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 5px;
+    background-color: #ff0000; /* Red overline */
+    border-radius: 5px 5px 0 0;
+  }
+  

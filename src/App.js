@@ -15,48 +15,68 @@ const App = () => {
   const [filteredComics, setFilteredComics] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalComics, setTotalComics] = useState(0);
+  const comicsPerPage = 40;
 
   const publicKey = process.env.REACT_APP_MARVEL_PUBLIC_KEY;
   const privateKey = process.env.REACT_APP_MARVEL_PRIVATE_KEY;
   const ts = new Date().getTime();
   const hash = getMarvelHash(ts, privateKey, publicKey);
 
-  const fetchComics = (page = 1) => {
-    const offset = (page - 1) * 20;
-    axios
-      .get('https://gateway.marvel.com/v1/public/comics', {
+  const fetchComics = async (offset = 0) => {
+    try {
+      const response = await axios.get('https://gateway.marvel.com/v1/public/comics', {
         params: {
           ts,
           apikey: publicKey,
           hash,
-          limit: 40,
+          limit: 100,
           offset: offset,
         },
-      })
-      .then(response => {
-        const allComics = response.data.data.results;
-        setComics(allComics);
-        filterComics(allComics); // Filter comics after fetching them
-        setTotalComics(response.data.data.total);
-      })
-      .catch(error => {
-        console.error('Error fetching data from Marvel API', error);
       });
+      console.log('Fetched comics batch:', response.data.data.results); // Debug log
+      return response.data.data.results;
+    } catch (error) {
+      console.error('Error fetching data from Marvel API', error);
+      return [];
+    }
+  };
+
+  const fetchAllComics = async () => {
+    let allComics = [];
+    let offset = 0;
+    let hasMoreComics = true;
+
+    while (hasMoreComics) {
+      const comicsBatch = await fetchComics(offset);
+      if (comicsBatch.length > 0) {
+        allComics = [...allComics, ...comicsBatch];
+        offset += 100;
+      } else {
+        hasMoreComics = false;
+      }
+    }
+
+    setComics(allComics);
+    setFilteredComics(allComics);
+    setTotalComics(allComics.length);
+    console.log('All fetched comics:', allComics); // Debug log
   };
 
   useEffect(() => {
-    fetchComics(currentPage);
-  }, [currentPage]); // Fetch comics only when current page changes
+    fetchAllComics();
+  }, []);
 
   useEffect(() => {
-    filterComics(comics); // Filter comics whenever the search term changes
+    filterComics(search);
   }, [search, comics]);
 
-  const filterComics = (comicsToFilter) => {
-    const filtered = comicsToFilter.filter(comic =>
-      comic.title.toLowerCase().includes(search.toLowerCase())
+  const filterComics = (searchValue) => {
+    const filtered = comics.filter(comic =>
+      comic.title.toLowerCase().startsWith(searchValue.toLowerCase())
     );
     setFilteredComics(filtered);
+    setCurrentPage(1); // Reset to the first page when filtering
+    console.log('Filtered comics:', filtered); // Debug log
   };
 
   const handleSearchChange = (e) => {
@@ -79,11 +99,11 @@ const App = () => {
         </header>
         <Routes>
           <Route path="/" element={<>
-            <ComicList comics={filteredComics} />
+            <ComicList comics={filteredComics.slice((currentPage - 1) * comicsPerPage, currentPage * comicsPerPage)} />
             <Pagination
               currentPage={currentPage}
               setCurrentPage={setCurrentPage}
-              totalComics={totalComics / 40}
+              totalComics={Math.ceil(filteredComics.length / comicsPerPage)}
             />
           </>} />
           <Route path="/comic/:id" element={<ComicDetails comics={comics} />} />
