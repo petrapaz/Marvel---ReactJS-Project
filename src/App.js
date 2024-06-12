@@ -24,12 +24,6 @@ const App = () => {
 
   const fetchComics = async (offset = 0, retries = 3) => {
     try {
-      // Check if rate limit exceeded
-      if (retries === 3) {
-        console.error('Exceeded maximum retry attempts. Pausing requests to avoid rate limit.');
-        return [];
-      }
-  
       const response = await axios.get('https://gateway.marvel.com/v1/public/comics', {
         params: {
           ts,
@@ -39,11 +33,9 @@ const App = () => {
           offset: offset,
         },
       });
-      console.log('Fetched comics batch:', response.data.data.results); // Debug log
       return response.data.data.results;
     } catch (error) {
-      if (error.response && error.response.status === 429) {
-        console.error('Rate limit exceeded. Pausing requests to avoid rate limit.');
+      if (error.response && error.response.status === 429 && retries > 0) {
         await new Promise(resolve => setTimeout(resolve, 60000)); // Wait for 1 minute
         return fetchComics(offset, retries - 1); // Retry fetching comics with one less retry
       } else {
@@ -52,8 +44,6 @@ const App = () => {
       }
     }
   };
-  
-  
 
   const fetchTotalComicsCount = async () => {
     try {
@@ -86,10 +76,19 @@ const App = () => {
       await fetchPageComics(currentPage);
     };
     initializeComics();
-  }, [currentPage]);
+  }, []);
 
-  const fetchComicsByTitle = async (title) => {
+  useEffect(() => {
+    if (search) {
+      fetchComicsByTitle(search, currentPage);
+    } else {
+      fetchPageComics(currentPage);
+    }
+  }, [search, currentPage]);
+
+  const fetchComicsByTitle = async (title, page = 1) => {
     try {
+      const offset = (page - 1) * comicsPerPage;
       const response = await axios.get('https://gateway.marvel.com/v1/public/comics', {
         params: {
           ts,
@@ -97,32 +96,25 @@ const App = () => {
           hash,
           titleStartsWith: title,
           limit: comicsPerPage,
+          offset: offset,
         },
       });
-      console.log('Fetched comics by title:', response.data.data.results); // Debug log
       setFilteredComics(response.data.data.results);
+      setTotalComics(response.data.data.total);
     } catch (error) {
       if (error.response && error.response.status === 429) {
-        console.error('Rate limit exceeded. Retrying in 1 minute...');
-        await new Promise(resolve => setTimeout(resolve, 60000)); // Wait for 1 minute before retrying
-        return fetchComicsByTitle(title); // Retry fetching comics by title
+        await new Promise(resolve => setTimeout(resolve, 60000)); // Wait for 1 minute
+        return fetchComicsByTitle(title, page); // Retry fetching comics by title
       } else {
         console.error('Error fetching data from Marvel API', error);
       }
     }
   };
 
-  useEffect(() => {
-    if (search) {
-      fetchComicsByTitle(search);
-    } else {
-      fetchPageComics(currentPage);
-    }
-  }, [search, currentPage]);
-
   const handleSearchChange = (e) => {
     const searchValue = e.target.value;
     setSearch(searchValue);
+    setCurrentPage(1); // Reset to the first page on new search
   };
 
   return (
@@ -140,11 +132,11 @@ const App = () => {
         </header>
         <Routes>
           <Route path="/" element={<>
-            <ComicList comics={filteredComics.slice((currentPage - 1) * comicsPerPage, currentPage * comicsPerPage)} />
+            <ComicList comics={filteredComics} />
             <Pagination
               currentPage={currentPage}
               setCurrentPage={setCurrentPage}
-              totalComics={Math.ceil(filteredComics.length / comicsPerPage)}
+              totalComics={Math.ceil(totalComics / comicsPerPage)}
             />
           </>} />
           <Route path="/comic/:id" element={<ComicDetails comics={comics} />} />
