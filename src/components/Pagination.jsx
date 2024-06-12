@@ -1,29 +1,27 @@
 // src/components/Pagination.js
 import React from 'react';
+//import {comicsPerPage} from '../App'
 import '../styles/Pagination.css';
 
 const Pagination = ({ currentPage, setCurrentPage, totalComics }) => {
-  const totalPages = Math.ceil(totalComics / 20);
-
-  const handlePrevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
+  const comicsPerPage = 40;
+  const totalPages = Math.ceil(totalComics / comicsPerPage);
 
   const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
+    setCurrentPage(currentPage + 1);
+  };
+
+  const handlePrevPage = () => {
+    setCurrentPage(currentPage - 1);
   };
 
   return (
     <div className="pagination">
       <button onClick={handlePrevPage} disabled={currentPage === 1}>
-        Previous
+        Prev
       </button>
-      <span>{currentPage} / {totalPages}</span>
-      <button onClick={handleNextPage} disabled={currentPage === totalPages}>
+      <span>{currentPage}</span> / <span>{totalPages}</span>
+      <button onClick={handleNextPage} disabled={currentPage === totalPages || totalComics === 0}>
         Next
       </button>
     </div>

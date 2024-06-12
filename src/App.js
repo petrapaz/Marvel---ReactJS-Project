@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import axios from 'axios';
-import { getMarvelHash } from './utils/hash';
 import ComicList from './components/ComicList';
 import SearchBar from './components/SearchBar';
 import './styles/App.css';
@@ -18,24 +17,27 @@ const App = () => {
   const comicsPerPage = 40;
 
   const publicKey = process.env.REACT_APP_MARVEL_PUBLIC_KEY;
-  const privateKey = process.env.REACT_APP_MARVEL_PRIVATE_KEY;
-  const ts = new Date().getTime();
-  const hash = getMarvelHash(ts, privateKey, publicKey);
 
   const fetchComics = async (offset = 0, retries = 3) => {
     try {
+      if (retries === 0) {
+        console.error('Exceeded maximum retry attempts. No more retries.');
+        return [];
+      }
+
       const response = await axios.get('https://gateway.marvel.com/v1/public/comics', {
         params: {
-          ts,
           apikey: publicKey,
-          hash,
           limit: comicsPerPage,
           offset: offset,
         },
       });
+
+      console.log('Fetched comics batch:', response.data.data.results); // Debug log
       return response.data.data.results;
     } catch (error) {
-      if (error.response && error.response.status === 429 && retries > 0) {
+      if (error.response && error.response.status === 429) {
+        console.error('Rate limit exceeded. Pausing requests to avoid rate limit.');
         await new Promise(resolve => setTimeout(resolve, 60000)); // Wait for 1 minute
         return fetchComics(offset, retries - 1); // Retry fetching comics with one less retry
       } else {
@@ -49,12 +51,11 @@ const App = () => {
     try {
       const response = await axios.get('https://gateway.marvel.com/v1/public/comics', {
         params: {
-          ts,
           apikey: publicKey,
-          hash,
           limit: 1,
         },
       });
+      console.log('Total comics count:', response.data.data.total); // Debug log
       return response.data.data.total;
     } catch (error) {
       console.error('Error fetching total comics count from Marvel API', error);
@@ -76,45 +77,43 @@ const App = () => {
       await fetchPageComics(currentPage);
     };
     initializeComics();
-  }, []);
+  }, [currentPage]);
 
-  useEffect(() => {
-    if (search) {
-      fetchComicsByTitle(search, currentPage);
-    } else {
-      fetchPageComics(currentPage);
-    }
-  }, [search, currentPage]);
-
-  const fetchComicsByTitle = async (title, page = 1) => {
+  const fetchComicsByTitle = async (title) => {
     try {
-      const offset = (page - 1) * comicsPerPage;
       const response = await axios.get('https://gateway.marvel.com/v1/public/comics', {
         params: {
-          ts,
           apikey: publicKey,
-          hash,
           titleStartsWith: title,
           limit: comicsPerPage,
-          offset: offset,
         },
       });
+  
+      console.log('Fetched comics by title:', response.data.data.results); // Debug log
       setFilteredComics(response.data.data.results);
-      setTotalComics(response.data.data.total);
+      setTotalComics(response.data.data.total); // Update totalComics state with the total count of comics matching the search query
     } catch (error) {
       if (error.response && error.response.status === 429) {
-        await new Promise(resolve => setTimeout(resolve, 60000)); // Wait for 1 minute
-        return fetchComicsByTitle(title, page); // Retry fetching comics by title
+        console.error('Rate limit exceeded. Retrying in 1 minute...');
+        await new Promise(resolve => setTimeout(resolve, 60000)); // Wait for 1 minute before retrying
+        return fetchComicsByTitle(title); // Retry fetching comics by title
       } else {
         console.error('Error fetching data from Marvel API', error);
       }
     }
   };
+  
+  useEffect(() => {
+    if (search) {
+      fetchComicsByTitle(search);
+    } else {
+      fetchPageComics(currentPage);
+    }
+  }, [search, currentPage]);
 
   const handleSearchChange = (e) => {
     const searchValue = e.target.value;
     setSearch(searchValue);
-    setCurrentPage(1); // Reset to the first page on new search
   };
 
   return (
@@ -132,11 +131,11 @@ const App = () => {
         </header>
         <Routes>
           <Route path="/" element={<>
-            <ComicList comics={filteredComics} />
+            <ComicList comics={filteredComics.slice((currentPage - 1) * comicsPerPage, currentPage * comicsPerPage)} />
             <Pagination
               currentPage={currentPage}
               setCurrentPage={setCurrentPage}
-              totalComics={Math.ceil(totalComics / comicsPerPage)}
+              totalComics={Math.ceil(filteredComics.length / comicsPerPage)}
             />
           </>} />
           <Route path="/comic/:id" element={<ComicDetails comics={comics} />} />
@@ -147,3 +146,4 @@ const App = () => {
 };
 
 export default App;
+
