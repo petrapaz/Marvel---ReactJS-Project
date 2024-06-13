@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ComicList from './components/ComicList';
 import SearchBar from './components/SearchBar';
@@ -8,17 +8,22 @@ import ComicDetails from './components/ComicDetails';
 import Pagination from './components/Pagination';
 import logo from './pics/logo.png';
 
-const App = () => {
-  const [comics, setComics] = useState([]);
-  const [search, setSearch] = useState('');
+const AppContent = () => {
   const [filteredComics, setFilteredComics] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
   const [totalComics, setTotalComics] = useState(0);
+  const [totalFilteredComics, setTotalFilteredComics] = useState(0);
   const comicsPerPage = 40;
 
   const publicKey = process.env.REACT_APP_MARVEL_PUBLIC_KEY;
 
-  const fetchComics = async (offset = 0, retries = 3) => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const query = new URLSearchParams(location.search);
+  const search = query.get('search') || '';
+  const currentPage = parseInt(query.get('page'), 10) || 1;
+
+  const fetchComics = useCallback(async (offset = 0, retries = 3) => {
     try {
       if (retries === 0) {
         console.error('Exceeded maximum retry attempts. No more retries.');
@@ -45,9 +50,9 @@ const App = () => {
         return [];
       }
     }
-  };
+  }, [publicKey, comicsPerPage]);
 
-  const fetchTotalComicsCount = async () => {
+  const fetchTotalComicsCount = useCallback(async () => {
     try {
       const response = await axios.get('https://gateway.marvel.com/v1/public/comics', {
         params: {
@@ -61,89 +66,103 @@ const App = () => {
       console.error('Error fetching total comics count from Marvel API', error);
       return 0;
     }
-  };
+  }, [publicKey]);
 
-  const fetchPageComics = async (page) => {
+  const fetchPageComics = useCallback(async (page) => {
     const offset = (page - 1) * comicsPerPage;
     const comicsBatch = await fetchComics(offset);
-    setComics(comicsBatch);
     setFilteredComics(comicsBatch);
-  };
+  }, [fetchComics, comicsPerPage]);
 
-  useEffect(() => {
-    const initializeComics = async () => {
-      const total = await fetchTotalComicsCount();
-      setTotalComics(total);
-      await fetchPageComics(currentPage);
-    };
-    initializeComics();
-  }, [currentPage]);
-
-  const fetchComicsByTitle = async (title) => {
+  const fetchComicsByTitle = useCallback(async (title, page) => {
+    const offset = (page - 1) * comicsPerPage;
     try {
       const response = await axios.get('https://gateway.marvel.com/v1/public/comics', {
         params: {
           apikey: publicKey,
           titleStartsWith: title,
           limit: comicsPerPage,
+          offset: offset,
         },
       });
-  
+
       console.log('Fetched comics by title:', response.data.data.results); // Debug log
       setFilteredComics(response.data.data.results);
-      setTotalComics(response.data.data.total); // Update totalComics state with the total count of comics matching the search query
+      setTotalFilteredComics(response.data.data.total); // Update totalFilteredComics state with the total count of comics matching the search query
     } catch (error) {
       if (error.response && error.response.status === 429) {
         console.error('Rate limit exceeded. Retrying in 1 minute...');
         await new Promise(resolve => setTimeout(resolve, 60000)); // Wait for 1 minute before retrying
-        return fetchComicsByTitle(title); // Retry fetching comics by title
+        return fetchComicsByTitle(title, page); // Retry fetching comics by title
       } else {
         console.error('Error fetching data from Marvel API', error);
       }
     }
-  };
-  
+  }, [publicKey, comicsPerPage]);
+
   useEffect(() => {
-    if (search) {
-      fetchComicsByTitle(search);
-    } else {
-      fetchPageComics(currentPage);
-    }
-  }, [search, currentPage]);
+    const initializeComics = async () => {
+      const total = await fetchTotalComicsCount();
+      setTotalComics(total);
+      if (search) {
+        await fetchComicsByTitle(search, currentPage);
+      } else {
+        await fetchPageComics(currentPage);
+      }
+    };
+    initializeComics();
+  }, [currentPage, search, fetchTotalComicsCount, fetchPageComics, fetchComicsByTitle]);
 
   const handleSearchChange = (e) => {
     const searchValue = e.target.value;
-    setSearch(searchValue);
+    navigate(`/?search=${searchValue}&page=1`);
   };
 
+  const setCurrentPage = (page) => {
+    navigate(`/?search=${search}&page=${page}`);
+  };
+
+  const totalPages = search
+    ? Math.ceil(totalFilteredComics / comicsPerPage)
+    : Math.ceil(totalComics / comicsPerPage);
+
+  console.log('totalPages:', totalPages);
+  console.log('totalFilteredComics:', totalFilteredComics);
+  console.log('totalComics:', totalComics);
+
   return (
-    <Router>
-      <div className="App">
-        <header className="fixed-header">
-          <div className="header-content">
-            <div className="logo-search-container">
-              <Link to="/" className="logo-link">
-                <img src={logo} alt="Marvel Comics" className="logo" />
-              </Link>
-              <SearchBar search={search} handleSearchChange={handleSearchChange} />
-            </div>
+    <div>
+      <header className="fixed-header">
+        <div className="header-content">
+          <div className="logo-search-container">
+            <Link to="/" className="logo-link">
+              <img src={logo} alt="Marvel Comics" className="logo" />
+            </Link>
+            <SearchBar search={search} handleSearchChange={handleSearchChange} />
           </div>
-        </header>
-        <Routes>
-          <Route path="/" element={<>
-            <ComicList comics={filteredComics.slice((currentPage - 1) * comicsPerPage, currentPage * comicsPerPage)} />
-            <Pagination
-              currentPage={currentPage}
-              setCurrentPage={setCurrentPage}
-              totalComics={Math.ceil(filteredComics.length / comicsPerPage)}
-            />
-          </>} />
-          <Route path="/comic/:id" element={<ComicDetails comics={comics} />} />
-        </Routes>
-      </div>
-    </Router>
+        </div>
+      </header>
+      <ComicList comics={filteredComics} />
+      <Pagination
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+        totalPages={totalPages || 0}
+      />
+    </div>
   );
 };
 
+const App = () => (
+  <Router>
+    <Routes>
+      <Route path="/" element={<AppContent />} />
+      <Route path="/comic/:id" element={<ComicDetails />} />
+    </Routes>
+  </Router>
+);
+
 export default App;
+
+
+
 

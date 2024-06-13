@@ -7,7 +7,7 @@
 
 ## TASK:
 1. Instantiate a new React project and push it to a github repo
-2. Use the Marvel API https://developer.marvel.com/ to get a list of comics and display them on page, cards with at least an image, title and description (you need to create account and obtain API Key)
+2. Use the Marvel API https://developer.marvel.com/ to get a list of comics and display them on page, cards with at least an image, title and description (you need to create account and obtain API Key)
 3. Details route - When you click on a card it should take you to a new route with that cards details
 4. Add search functionality
 5. Add pagination, go to next or previous page

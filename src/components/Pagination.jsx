@@ -1,6 +1,5 @@
 // src/components/Pagination.js
 import React from 'react';
-//import {comicsPerPage} from '../App'
 import '../styles/Pagination.css';
 
 const Pagination = ({ currentPage, setCurrentPage, totalComics }) => {
