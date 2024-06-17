@@ -1,9 +1,6 @@
-
-// src/components/ComicDetails.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
-import { getMarvelHash } from '../utils/hash'; // Ensure the path is correct
 import '../styles/ComicDetails.css';
 
 const ComicDetails = () => {
@@ -15,17 +12,16 @@ const ComicDetails = () => {
     const fetchComicDetails = async () => {
       try {
         const publicKey = process.env.REACT_APP_MARVEL_PUBLIC_KEY;
-        const privateKey = process.env.REACT_APP_MARVEL_PRIVATE_KEY;
-        const ts = new Date().getTime();
-        const hash = getMarvelHash(ts, privateKey, publicKey);
+
+        console.log('Fetching comic details for ID:', id); // Add this line
 
         const response = await axios.get(`https://gateway.marvel.com/v1/public/comics/${id}`, {
           params: {
-            ts,
             apikey: publicKey,
-            hash,
           },
         });
+
+        console.log('Comic details response:', response.data); // Add this line
 
         setComic(response.data.data.results[0]);
         setLoading(false);
@@ -48,12 +44,9 @@ const ComicDetails = () => {
 
   return (
     <div className="comic-details">
-        
-        <img src={`${comic.thumbnail.path}/portrait_incredible.${comic.thumbnail.extension}`} alt={comic.title} />
-        
-
+      <img src={`${comic.thumbnail.path}/portrait_incredible.${comic.thumbnail.extension}`} alt={comic.title} />
       <div className='detail-text'>
-      <h2>{comic.title}</h2>
+        <h2>{comic.title}</h2>
         <p>{comic.description}</p>
         <p><strong>Page Count:</strong> {comic.pageCount}</p>
         <p><strong>Series:</strong> {comic.series.name}</p>
