@@ -15,6 +15,11 @@
 - Website should be responsive, cover mobile, tablet, laptop
 - You can use all the tools available and libraries
 
+#### Additional tasks:
+- integrate tanstack query and typescript into app
+- solve loading state
+- divide app by components into better structure
+
 ## MARVEL DEVELOPER PORTAL:
 - go to My developer account to fetch private and public api keys
 - go to Your authorized referrers. List any domains that can make calls to the Marvel Comics API using your API key here: localhost, IP address, *, developer.marvel.com, localhost
@@ -54,6 +59,11 @@ Marvel API requires a hash to authenticate requests, which includes a timestamp,
      - npm install
      - npm start //this command opens project on localhost
 
+10) tanstack query and typescript: 
+      npm install @tanstack/react-query axios
+      npm install typescript @types/react @types react-dom
+
+(verify dependencies: npm install @tanstack/react-query axios react-router-dom)
 
 ____________________________________________________________________________
        
@@ -87,14 +97,4 @@ The build is minified and the filenames include the hashes.\
 Your app is ready to be deployed!
 
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
