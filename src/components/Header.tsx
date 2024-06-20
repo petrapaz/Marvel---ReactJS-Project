@@ -1,25 +1,27 @@
+// src/components/Header.tsx
 import React from 'react';
-import { Link } from 'react-router-dom';
-import logo from '../pics/logo.png'; // Adjust the path to your logo image
-import '../styles/index.css'; // Ensure Tailwind CSS is imported
+import { Link, useNavigate } from 'react-router-dom';
+import logo from '../pics/logo.png';
+import SearchBar from './SearchBar';
 
-const Header = () => {
+const Header: React.FC<{ search: string, handleSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void, handleSortChange: (e: React.ChangeEvent<HTMLSelectElement>) => void }> = ({ search, handleSearchChange, handleSortChange }) => {
   return (
-    <header className="bg-gray-800 p-4">
-      <div className="header-content flex justify-between items-center">
-        <div className="logo-search-container flex items-center">
-          <Link to="/" className="logo-link mr-4">
-            <img src={logo} alt="Marvel Logo" className="logo h-10" />
-          </Link>
-          <input 
-            type="text" 
-            placeholder="Search for comics..." 
-            className="p-2 rounded border border-gray-300 w-full max-w-xs"
-          />
-        </div>
-        <Link to="/" className="back-to-home text-white">
-          Back to Homepage
+    <header className="bg-gray-900 text-white p-4 fixed w-full top-0 z-10">
+      <div className="container mx-auto flex justify-between items-center">
+        <Link to="/" className="flex items-center">
+          <img src={logo} alt="Marvel Comics" className="h-8 mr-2" />
+          <span className="text-xl font-bold">Marvel Comics</span>
         </Link>
+        <div className="flex items-center space-x-4">
+          <SearchBar search={search} handleSearchChange={handleSearchChange} />
+          <select
+            onChange={handleSortChange}
+            className="bg-gray-800 text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-red-600"
+          >
+            <option value="random">Random</option>
+            <option value="alphabetical">A-Z</option>
+          </select>
+        </div>
       </div>
     </header>
   );

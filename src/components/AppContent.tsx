@@ -12,15 +12,26 @@ import '../styles/index.css';
 
 const publicKey = process.env.REACT_APP_MARVEL_PUBLIC_KEY as string;
 
-const fetchComics = async (offset: number, search: string) => {
+const fetchComics = async (offset: number, search: string, sortBy: string) => {
+  const params: any = {
+    apikey: publicKey,
+    limit: 40,
+    offset: offset,
+    titleStartsWith: search || undefined,
+  };
+
+  if (sortBy === 'alphabetical') {
+    params.orderBy = 'title';
+  }
+
   const response = await axios.get('https://gateway.marvel.com/v1/public/comics', {
-    params: {
-      apikey: publicKey,
-      limit: 40,
-      offset: offset,
-      titleStartsWith: search || undefined,
-    },
+    params,
   });
+
+  if (sortBy === 'random') {
+    response.data.data.results.sort(() => Math.random() - 0.5);
+  }
+
   return response.data.data;
 };
 
@@ -31,21 +42,27 @@ const AppContent: React.FC = () => {
   const query = new URLSearchParams(location.search);
   const search = query.get('search') || '';
   const currentPage = parseInt(query.get('page') || '1', 10);
+  const sortBy = query.get('sortBy') || 'random'; // Default to 'random' sorting
 
   const offset = (currentPage - 1) * 40;
 
   const { data, error, isLoading } = useQuery({
-    queryKey: ['comics', offset, search],
-    queryFn: () => fetchComics(offset, search),
+    queryKey: ['comics', offset, search, sortBy],
+    queryFn: () => fetchComics(offset, search, sortBy),
   });
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const searchValue = e.target.value;
-    navigate(`/?search=${searchValue}&page=1`);
+    navigate(`/?search=${searchValue}&page=1&sortBy=${sortBy}`);
+  };
+
+  const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const sortValue = e.target.value;
+    navigate(`/?search=${search}&page=1&sortBy=${sortValue}`);
   };
 
   const setCurrentPage = (page: number) => {
-    navigate(`/?search=${search}&page=${page}`);
+    navigate(`/?search=${search}&page=${page}&sortBy=${sortBy}`);
   };
 
   const comics: Comic[] = data?.results || [];
@@ -61,6 +78,16 @@ const AppContent: React.FC = () => {
               <img src={logo} alt="Marvel Comics" className="h-10" />
             </Link>
             <SearchBar search={search} handleSearchChange={handleSearchChange} />
+          </div>
+          <div>
+            <select
+              onChange={handleSortChange}
+              value={sortBy}
+              className="bg-gray-800 text-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-red-600"
+            >
+              <option value="random">Random</option>
+              <option value="alphabetical">A-Z</option>
+            </select>
           </div>
         </div>
       </header>
