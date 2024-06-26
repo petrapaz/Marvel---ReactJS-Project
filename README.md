@@ -20,6 +20,16 @@
 - solve loading state
 - divide app by components into better structure
 
+#### Improvements:
+- Migrate project to Vite
+- Setup prettier project wide
+- Add debounce on search and research
+- Research what are limitations of using index as keys in map
+- Use tanstack query project wide and useQuery in custom hooks for readability and reusability
+- Css
+- Remove unused packages and files
+- Back button on details and remain in context
+
 ## MARVEL DEVELOPER PORTAL:
 - go to My developer account to fetch private and public api keys
 - go to Your authorized referrers. List any domains that can make calls to the Marvel Comics API using your API key here: localhost, IP address, *, developer.marvel.com, localhost

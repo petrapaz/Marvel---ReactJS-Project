@@ -1,4 +1,3 @@
-// src/components/AppContent.tsx
 import React from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -8,7 +7,6 @@ import SearchBar from './SearchBar';
 import Pagination from './Pagination';
 import logo from '../pics/logo.png';
 import { Comic } from '../types/comic';
-import '../styles/index.css';
 
 const publicKey = process.env.REACT_APP_MARVEL_PUBLIC_KEY as string;
 
@@ -119,5 +117,3 @@ const AppContent: React.FC = () => {
 };
 
 export default AppContent;
-
-
